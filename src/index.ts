@@ -8,11 +8,20 @@ const { fetchProductCatalog, fetchProductReviews, fetchSalesReport } =
 // Chain these Promises together to simulate the flow
 
 fetchProductCatalog()
+  .catch((err) => {
+    // catch for fetchProductCatalog()
+    console.log("Failed to fetch Product Catalog", err);
+    throw err;
+  })
   .then((products) => {
     console.log("--- Product Catalog Loaded ---");
     console.log(products);
     const reviewPromises = products.map((product) => {
-      return fetchProductReviews(product.id);
+      return fetchProductReviews(product.id).catch((err) => {
+        // catch for fetchProductReviews()
+        console.error("Failed to fetch product reviews:", err);
+        return [];
+      });
     });
     return Promise.all(reviewPromises);
   })
@@ -20,6 +29,7 @@ fetchProductCatalog()
     console.log("--- Product Reviews Loaded ---");
     console.log(productReviews);
     let allRIds: number[] = [];
+
     productReviews.forEach((reviewArray) => {
       reviewArray.forEach((review) => {
         allRIds.push(review.id_Product);
@@ -29,7 +39,10 @@ fetchProductCatalog()
     const uniqueIds = [...new Set(allRIds)]; // Clean up duplicates so you only fetch the sales report once per product ID
 
     const salesReportPromises = uniqueIds.map((id) => {
-      return fetchSalesReport(id); // return Review[]
+      return fetchSalesReport(id).catch((err) => {
+        console.error("Failed to fetch sales report:", err);
+        return [];
+      }); // return Review[]
     });
     return Promise.all(salesReportPromises);
   })
