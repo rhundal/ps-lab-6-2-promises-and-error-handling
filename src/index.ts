@@ -52,4 +52,7 @@ fetchProductCatalog()
   })
   .catch((error) => {
     console.error(" Caught an expected simulator error:", error);
+  })
+  .finally(() => {
+    console.log("All API Calls have been attempted");
   });
