@@ -2,6 +2,8 @@
 Each function should return a Promise that resolves with mock data after a delay, or rejects with an error message.
 */
 
+import validateNetworkError from "./modules/networkError.js";
+
 type Product = {
   id: number;
   name: string;
@@ -10,6 +12,9 @@ type Product = {
 
 const fetchProductCatalog = (): Promise<Product[]> => {
   return new Promise((resolve, reject) => {
+    // check network
+    validateNetworkError("offline");
+
     setTimeout(() => {
       if (Math.random() < 0.95) {
         resolve([
