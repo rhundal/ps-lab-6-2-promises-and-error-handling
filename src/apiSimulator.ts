@@ -3,6 +3,11 @@ Each function should return a Promise that resolves with mock data after a delay
 */
 
 import validateNetworkError from "./modules/networkError.js";
+import {
+  validateDataErrorForProducts,
+  validateDataErrorForReviews,
+  validateDataErrorForSalesReport,
+} from "./modules/dataError.js";
 
 type Product = {
   id: number;
@@ -13,15 +18,17 @@ type Product = {
 const fetchProductCatalog = (): Promise<Product[]> => {
   return new Promise((resolve, reject) => {
     // check network
-    validateNetworkError("offline");
+    let productsToTest = [
+      { id: 1, name: "Laptop", price: 1200 },
+      { id: 2, name: "Headphones", price: 200 },
+      { id: 2, name: "Shoes", price: 300 },
+    ];
+    validateNetworkError("online");
+    validateDataErrorForProducts(productsToTest); // check for Data Errors in fields of ProductCatalog
 
     setTimeout(() => {
       if (Math.random() < 0.95) {
-        resolve([
-          { id: 1, name: "Laptop", price: 1200 },
-          { id: 2, name: "Headphones", price: 200 },
-          { id: 2, name: "Shoes", price: 300 },
-        ]);
+        resolve(productsToTest);
       } else {
         reject("Failed to fetch product catalog");
       }
@@ -36,16 +43,17 @@ type Review = {
 
 const fetchProductReviews = (productId: number): Promise<Review[]> => {
   return new Promise((resolve, reject) => {
+    const allMockReviews = [
+      { id_Product: 1, rating: 3 },
+      { id_Product: 1, rating: 5 },
+      { id_Product: 1, rating: 6 },
+      { id_Product: 2, rating: 8 },
+      { id_Product: 2, rating: 7 },
+      { id_Product: 2, rating: 3 },
+    ];
+    validateDataErrorForReviews(allMockReviews); // check for Data Errors in fields of Reviews
     setTimeout(() => {
       if (Math.random() < 0.95) {
-        const allMockReviews = [
-          { id_Product: 1, rating: 3 },
-          { id_Product: 1, rating: 5 },
-          { id_Product: 1, rating: 6 },
-          { id_Product: 2, rating: 8 },
-          { id_Product: 2, rating: 7 },
-          { id_Product: 2, rating: 3 },
-        ];
         // 2. Filter so it ONLY returns reviews matching this productId
         const filteredReviews = allMockReviews.filter(
           (review) => review.id_Product === productId,
@@ -61,23 +69,25 @@ const fetchProductReviews = (productId: number): Promise<Review[]> => {
 };
 
 type SalesReport = {
-  id_Product: number;
-  totalSales: number;
-  unitsSold: number;
-  averagePrice: number;
+  id_Product: number | null;
+  totalSales: number | null;
+  unitsSold: number | null;
+  averagePrice: number | null;
 };
 
 const fetchSalesReport = (productId: number): Promise<SalesReport> => {
   return new Promise((resolve, reject) => {
+    let mockReport = {
+      // apply same mock data for each product
+      id_Product: productId,
+      totalSales: null,
+      unitsSold: 30,
+      averagePrice: 21,
+    };
+    validateDataErrorForSalesReport(mockReport); // check for Data Errors in fields of Sales Report
     setTimeout(() => {
       if (Math.random() < 0.95) {
-        resolve({
-          // apply same mock data for each product
-          id_Product: productId,
-          totalSales: 20000,
-          unitsSold: 30,
-          averagePrice: 21,
-        });
+        resolve(mockReport);
       } else {
         reject(`Failed to fetch sales report for ${productId}.`);
       }
