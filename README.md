@@ -10,4 +10,8 @@
 
 #### When might a retry mechanism be more effective than an immediate failure response?
 
--
+- I attempted the extra credit. It was challenging and I had to look up syntax alot of times which I have
+  indicated in the code (utlities/retryPromise.ts) whenever i needed. I purposely make the last endpoint fail to demonstrate
+  this functionality. It might print currentTryCount two times; it seems its due to the async call to sales report via promise.all as per google.
+- I might use the retry mechanism for time sensitive payments in an application like stripe when the traffic spikes and causes
+  server or network issues.
